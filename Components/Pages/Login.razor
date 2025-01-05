@@ -1,0 +1,53 @@
+﻿@page "/"
+@using Personal_Expense_Tracking.Models
+@using Personal_Expense_Tracking.ViewModels
+
+<h1>Register</h1>
+
+<!-- Show the status message -->
+@if (!string.IsNullOrEmpty(userViewModel.StatusMessage))
+{
+    <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">
+        @userViewModel.StatusMessage
+    </MudText>
+}
+
+<EditForm Model="userViewModel.User" OnValidSubmit="userViewModel.HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <!-- Full Name -->
+                    <MudTextField Label="Full Name" HelperText="Enter your full name"
+                                  @bind-Value="userViewModel.User.Full_name" />
+                    <MudTextField Label="Username" HelperText="Max. 8 characters"
+                                  @bind-Value="userViewModel.User.Username" />
+
+                    <!-- Email -->
+                    <MudTextField Label="Email" HelperText="Enter a valid email"
+                                  @bind-Value="userViewModel.User.Email" InputType="InputType.Email" />
+
+                    <!-- Password -->
+                    <MudTextField Label="Password" HelperText="Choose a strong password"
+                                  @bind-Value="userViewModel.User.Password" InputType="InputType.Password" />
+
+                    <!-- Confirm Password Field -->
+                    <MudTextField Label="Confirm Password" HelperText="Repeat the password"
+                                  @bind-Value="userViewModel.ConfirmPassword" InputType="InputType.Password" />
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
+                        Register
+                    </MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+</EditForm>
+
+@code {
+    private UserViewModel userViewModel = new UserViewModel();
+}
