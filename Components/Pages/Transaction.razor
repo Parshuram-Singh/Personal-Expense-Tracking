@@ -1,7 +1,143 @@
-﻿
-@page "/transaction"
-<h3>Transaction</h3>
+﻿@page "/transaction"
+@using Personal_Expense_Tracking.Models
+@using Personal_Expense_Tracking.ViewModels
+@inject NavigationManager NavigationManager
+
+<div class="transaction-container">
+    <div class="transaction-box">
+        <h1 class="logo">Add Transaction</h1>
+        <p class="subtitle">Fill in the details below to add a transaction</p>
+
+        <!-- Form submission handler -->
+        <EditForm Model="@transaction" OnValidSubmit="HandleValidSubmitAsync">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <!-- Date and Time Input (Use HTML input instead of InputText) -->
+            <div class="form-group">
+                <label for="date-time">Transaction Date and Time</label>
+                <input id="date-time" @bind="transaction.Date" type="datetime-local" class="form-control" disabled />
+            </div>
+
+            <!-- Remarks Input -->
+            <div class="form-group">
+                <label for="remarks">Remarks</label>
+                <InputText id="remarks" @bind-Value="transaction.Remarks" class="form-control" placeholder="Enter transaction remarks" required />
+            </div>
+
+            <!-- Transaction Type Input -->
+            <div class="form-group">
+                <label for="type">Transaction Type</label>
+                <select id="type" @bind="transaction.Type" class="form-control" required>
+                    <option value="Credit">Credit</option>
+                    <option value="Debit">Debit</option>
+                    <option value="Debt">Debt</option>
+                </select>
+            </div>
+
+            <!-- Tag Input -->
+            <div class="form-group">
+                <label for="tag">Tag</label>
+                <InputText id="tag" @bind-Value="transaction.Tag" class="form-control" placeholder="Enter transaction tag" required />
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <InputNumber id="amount" @bind-Value="transaction.Amount" class="form-control" placeholder="Enter amount" required />
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Add Transaction</button>
+        </EditForm>
+    </div>
+</div>
 
 @code {
+    private Transactions transaction = new Transactions(); // Bind this to the form
+    private TransactionsViewModel transactionsViewModel = new TransactionsViewModel(); // ViewModel for transactions
 
+    // Handle form submission asynchronously
+    private async Task HandleValidSubmitAsync()
+    {
+        // Add the transaction to the database asynchronously
+        await transactionsViewModel.AddTransaction(transaction);
+
+        // Optionally, clear the form after submission
+        transaction = new Transactions();
+    }
 }
+
+<style>
+    .transaction-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        padding: 1rem;
+    }
+
+    .transaction-box {
+        background-color: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .logo {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1a1a1a;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a4a4a;
+            font-size: 0.9rem;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+    }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+</style>

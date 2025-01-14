@@ -1,46 +1,53 @@
 ﻿@page "/"
 @using Personal_Expense_Tracking.Models
 @using Personal_Expense_Tracking.ViewModels
+@using Personal_Expense_Tracking.Services
+@inject NavigationManager NavigationManager
+@inject UserService UserService
 
-<h1>Register</h1>
+<h1>Login</h1>
 
-<!-- Show the status message -->
-@if (!string.IsNullOrEmpty(userViewModel.StatusMessage))
+@if (!string.IsNullOrEmpty(StatusMessage))
 {
     <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">
-        @userViewModel.StatusMessage
+        @StatusMessage
     </MudText>
 }
 
-<EditForm Model="userViewModel.User" OnValidSubmit="userViewModel.HandleValidSubmit">
+<EditForm Model="user" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
-
     <MudGrid>
         <MudItem xs="12" sm="7">
             <MudCard>
                 <MudCardContent>
-                    <!-- Full Name -->
-                    <MudTextField Label="Full Name" HelperText="Enter your full name"
-                                  @bind-Value="userViewModel.User.Full_name" />
+                    <!-- Username -->
                     <MudTextField Label="Username" HelperText="Max. 8 characters"
-                                  @bind-Value="userViewModel.User.Username" />
-
-                    <!-- Email -->
-                    <MudTextField Label="Email" HelperText="Enter a valid email"
-                                  @bind-Value="userViewModel.User.Email" InputType="InputType.Email" />
+                                  @bind-Value="user.Username" For="@(() => user.Username)" />
 
                     <!-- Password -->
-                    <MudTextField Label="Password" HelperText="Choose a strong password"
-                                  @bind-Value="userViewModel.User.Password" InputType="InputType.Password" />
+                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                                  @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
 
-                    <!-- Confirm Password Field -->
-                    <MudTextField Label="Confirm Password" HelperText="Repeat the password"
-                                  @bind-Value="userViewModel.ConfirmPassword" InputType="InputType.Password" />
+                    <!-- Currency Selection -->
+                    <MudSelect @bind-Value="user.PreferredCurrency" Label="Choose Preferred Currency" Variant="Variant.Outlined" Class="mt-3">
+                        <MudSelectItem Value="@("NPR")">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Flag_of_Nepal.svg/209px-Flag_of_Nepal.svg.png" height="14" class="mr-1" />
+                            NPR (Nepalese Rupee)
+                        </MudSelectItem>
+                        <MudSelectItem Value="@("USD")">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Flag_of_the_United_States_%28Pantone%29.svg/383px-Flag_of_the_United_States_%28Pantone%29.svg.png" height="14" class="mr-1" />
+                            USD (Dollar)
+                        </MudSelectItem>
+                        <MudSelectItem Value="@("EUR")">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/383px-Flag_of_Europe.svg.png" height="14" class="mr-1" />
+                            EUR (Euro)
+                        </MudSelectItem>
+                    </MudSelect>
                 </MudCardContent>
+
                 <MudCardActions>
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-                        Register
+                        Login
                     </MudButton>
                 </MudCardActions>
             </MudCard>
@@ -49,5 +56,45 @@
 </EditForm>
 
 @code {
-    private UserViewModel userViewModel = new UserViewModel();
+
+    private User user = new User(); // Instance of User class from Models
+    private string? StatusMessage { get; set; } // To store the status message
+
+    private void OnValidSubmit()
+    {
+        try
+        {
+            System.Diagnostics.Debug.WriteLine($"Attempting login for user: {user.Username}");
+
+            if (UserService.VerifyUserCredentials(user.Username, user.Password))
+            {
+                System.Diagnostics.Debug.WriteLine("Login successful!");
+                StatusMessage = "Login successful!";
+                NavigationManager.NavigateTo("/dashboard");
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Invalid login attempt.");
+                StatusMessage = "Invalid login attempt. Please try again.";
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error during login: {ex.Message}");
+            StatusMessage = $"Error: {ex.Message}";
+        }
+    }
+
+
+    protected override void OnInitialized()
+    {
+        // Ensure a default user exists in the database
+        var defaultUser = new User
+            {
+                Username = "pratik",
+                Password = "12345", // Use hashed password in production
+                PreferredCurrency = "NPR"
+            };
+        UserService.EnsureUserExists(defaultUser);
+    }
 }

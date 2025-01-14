@@ -1,20 +1,18 @@
 ﻿using SQLite;
-using System.ComponentModel.DataAnnotations;
 
 namespace Personal_Expense_Tracking.Models
 {
     public class User
     {
-        [PrimaryKey, AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey, AutoIncrement, Column("_id")]
+        public int Id { get; set; }  
 
-        public string Full_name { get; set; }
-
+        [MaxLength(50), Unique, NotNull]
         public string Username { get; set; }
 
-        public string Email { get; set; }
-
-        public string Password { get; set; }
+        [NotNull]
+        public string Password { get; set; } // Store hashed password instead of plain text.
+        public string PreferredCurrency { get; set; } = "USD";
 
     }
 }

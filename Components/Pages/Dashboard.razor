@@ -1,10 +1,13 @@
 ﻿@page "/dashboard"
+@using Personal_Expense_Tracking.ViewModels
+@using Personal_Expense_Tracking.Models
+@inject NavigationManager NavigationManager
 
 <h3>Dashboard</h3>
 
 <MudGrid>
     <MudItem xs="12" class="d-flex justify-end mb-4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" startIcon="@Icons.Material.Filled.Add">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" startIcon="@Icons.Material.Filled.Add" OnClick="NavigateToTransactionPage">
             New Transaction
         </MudButton>
     </MudItem>
@@ -12,7 +15,7 @@
         <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
             <div>
                 <h4>Total Balance</h4>
-                <MudText Typo="Typo.h6">$@Balance</MudText>
+                <MudText Typo="Typo.h6">$@account.Balance</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -21,7 +24,7 @@
         <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
             <div>
                 <h4>Income</h4>
-                <MudText Typo="Typo.h6">$@Income</MudText>
+                <MudText Typo="Typo.h6">$@account.TotalCredit</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -30,7 +33,7 @@
         <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
             <div>
                 <h4>Expense</h4>
-                <MudText Typo="Typo.h6">$@Expense</MudText>
+                <MudText Typo="Typo.h6">$@account.TotalDebit</MudText>
             </div>
         </MudPaper>
     </MudItem>
@@ -39,20 +42,81 @@
         <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
             <div>
                 <h4>Pending Debts</h4>
-                <MudText Typo="Typo.h6">$@PendingDebts</MudText>
+                <MudText Typo="Typo.h6">$@account.TotalDebt</MudText>
             </div>
         </MudPaper>
     </MudItem>
 </MudGrid>
 
-
-
-
-
+<div class="container mt-5">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Date</th>
+                <th>Remarks</th>
+                <th>Type</th>
+                <th>Tags</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th> <!-- Added a new column for actions -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in transactionsViewModel.AllTransactions)
+            {
+                <tr>
+                    <td>@transaction.Id</td>
+                    <td>@transaction.Date.ToString("yyyy-MM-dd HH:mm")</td> <!-- Show date with time -->
+                    <td>@transaction.Remarks</td>
+                    <td>@transaction.Type</td>
+                    <td>@transaction.Tag</td>
+                    <td>@transaction.Amount.ToString("C")</td>
+                    <td>@transaction.Status</td>
+                    <td>
+                        <!-- Delete button -->
+                        <button class="btn btn-danger" @onclick="() => DeleteTransaction(transaction.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 @code {
-    public decimal Balance { get; set; } = 10000;
-    public decimal Income { get; set; } = 5000;
-    public decimal Expense { get; set; } = 2500;
-    public decimal PendingDebts { get; set; } = 1200;
+    private Account account = new Account();
+    private List<Transactions> transactions;
+    private TransactionsViewModel transactionsViewModel = new TransactionsViewModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch transactions and account totals
+        transactions = await transactionsViewModel.GetTransactions();
+        await GetDashboardTotals();
+    }
+
+    private async Task GetDashboardTotals()
+    {
+        // Fetch totals from the ViewModel
+        account.TotalCredit = await transactionsViewModel.GetTotalInflow();
+        account.TotalDebit = await transactionsViewModel.GetTotalOutflow();
+        account.Balance = await transactionsViewModel.GetTotalBalance();
+        account.TotalDebt = account.TotalDebit - account.TotalCredit; 
+    }
+
+    private void NavigateToTransactionPage()
+    {
+        // Navigate to the transaction page
+        NavigationManager.NavigateTo("/transaction");
+    }
+
+    private async Task DeleteTransaction(int transactionId)
+    {
+        // Call the async method in your ViewModel to delete the transaction by Id
+        await transactionsViewModel.DeleteTransaction(transactionId);
+
+        // Refresh the transaction list asynchronously after deletion
+        transactions = await transactionsViewModel.GetTransactions();
+        await GetDashboardTotals(); // Re-fetch dashboard totals after deletion
+    }
 }
