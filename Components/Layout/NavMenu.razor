@@ -1,34 +1,33 @@
 ﻿@* NavMenu.razor *@
 
-
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()" style="background-color: white;">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All" Style="color: #000;">
+            <NavLink class="nav-link" href="dashboard" Match="NavLinkMatch.All" Style="color: #000;" activeClass="active">
                 <MudIcon Icon="@Icons.Material.Filled.Dashboard" Color="Color.Primary" Size="Size.Large" />
                 <MudText Class="ml-2" Style="color: #000;">Dashboard</MudText>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="transaction" Style="color: #000;">
+            <NavLink class="nav-link" href="transaction" Style="color: #000;" activeClass="active">
                 <MudIcon Icon="@Icons.Material.Filled.SwapHoriz" Color="Color.Primary" Size="Size.Large" />
                 <MudText Class="ml-2" Style="color: #000;">Transaction</MudText>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dept" Style="color: #000;">
+            <NavLink class="nav-link" href="dept" Style="color: #000;" activeClass="active">
                 <MudIcon Icon="@Icons.Material.Filled.Money" Color="Color.Primary" Size="Size.Large" />
                 <MudText Class="ml-2" Style="color: #000;">Depts</MudText>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="importExport" Style="color: #000;">
+            <NavLink class="nav-link" href="importExport" Style="color: #000;" activeClass="active">
                 <MudIcon Icon="@Icons.Material.Filled.ImportExport" Color="Color.Primary" Size="Size.Large" />
                 <MudText Class="ml-2" Style="color: #000;">Import/Export</MudText>
             </NavLink>
         </div>
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="setting" Style="color: #000;">
+            <NavLink class="nav-link" href="setting" Style="color: #000;" activeClass="active">
                 <MudIcon Icon="@Icons.Material.Filled.Settings" Color="Color.Primary" Size="Size.Large" />
                 <MudText Class="ml-2" Style="color: #000;">Settings</MudText>
             </NavLink>
@@ -38,3 +37,8 @@
 
 @code {
 }
+
+   
+
+
+

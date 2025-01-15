@@ -3,150 +3,149 @@
 @using Personal_Expense_Tracking.ViewModels
 @inject NavigationManager NavigationManager
 
-<div class="dept-container">
-    <div class="dept-box">
-        <h1 class="logo">Add Debt</h1>
-        <p class="subtitle">Fill in the details below to add a debt</p>
+<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.Large">
+    <MudGrid>
+        <!-- Left Column for Summary Info (Total Debts & Pending Debts) -->
+        <MudItem xs="12" sm="12" md="6">
+            <MudGrid>
+                <!-- Total Debts Container -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4 mb-4">
+                        <h2 class="text-center">Total Debts</h2>
+                        <div class="text-center">
+                            <h3>@TotalDebts</h3>
+                        </div>
+                    </MudPaper>
+                </MudItem>
 
-        @if (!string.IsNullOrEmpty(StatusMessage))
-        {
-            <div class="status-message">
-                <MudText Typo="Typo.h6" Color="@(StatusMessage.Contains("success") ? Color.Success : Color.Error)" Class="mb-4">
-                    @StatusMessage
-                </MudText>
-            </div>
-        }
+                <!-- Pending Debts Container -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="2" Class="pa-4">
+                        <h2 class="text-center">Pending Debts</h2>
+                        <div class="text-center">
+                            <h3>@PendingDebts</h3>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+            </MudGrid>
+        </MudItem>
 
-        <EditForm Model="@dept" OnValidSubmit="HandleValidSubmit">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+        <!-- Right Column for Add Debt Form -->
+        <MudItem xs="12" sm="12" md="6">
+            <MudPaper Elevation="2" Class="pa-4">
+                <h1 class="text-center mb-3">Add Debt</h1>
+                <p class="text-center text-muted mb-4">Fill in the details below to add a debt</p>
 
-            <!-- Source Input -->
-            <div class="form-group">
-                <label for="source">Source</label>
-                <InputText id="source" @bind-Value="dept.Source" class="form-control" placeholder="Enter debt source" required />
-            </div>
+                @if (!string.IsNullOrEmpty(StatusMessage))
+                {
+                    <div class="alert @(StatusMessage.Contains("success") ? "alert-success" : "alert-danger")" role="alert">
+                        @StatusMessage
+                    </div>
+                }
 
-            <!-- Amount Input -->
-            <div class="form-group">
-                <label for="amount">Amount</label>
-                <InputNumber id="amount" @bind-Value="dept.Amount" class="form-control" placeholder="Enter amount" required />
-            </div>
+                <EditForm Model="@dept" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <!-- Due Date and Time Input -->
-            <div class="form-group">
-                <label for="due-date-time">Due Date and Time</label>
-                <input id="due-date-time" @bind="dept.DueDate" type="datetime-local" class="form-control" />
-            </div>
+                    <!-- Source Input -->
+                    <div class="mb-3">
+                        <label for="source" class="form-label">Source</label>
+                        <InputText id="source" @bind-Value="dept.Source" class="form-control" placeholder="Enter debt source" required />
+                    </div>
 
+                    <!-- Amount Input -->
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Amount</label>
+                        <InputNumber id="amount" @bind-Value="dept.Amount" class="form-control" placeholder="Enter amount" required />
+                    </div>
 
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn">Add Debt</button>
-        </EditForm>
+                    <!-- Due Date and Time Input -->
+                    <div class="mb-3">
+                        <label for="due-date-time" class="form-label">Due Date and Time</label>
+                        <input id="due-date-time" @bind="dept.DueDate" type="datetime-local" class="form-control" />
+                    </div>
 
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary w-100">Add Debt</button>
+                </EditForm>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-
-    </div>
-</div>
+    <!-- Debts List -->
+    <MudPaper Elevation="2" Class="pa-4 mt-4">
+        <h2 class="text-center">Manage Debts</h2>
+        <MudDataGrid Items="@AllDebts" HorizontalScrollbar="true" Bordered="true" Dense="true">
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Header="Id" />
+                <PropertyColumn Property="x => x.Source" Header="Source" />
+                <PropertyColumn Property="x => x.Amount" Header="Amount" />
+                <PropertyColumn Property="x => x.DueDate" Header="Due Date" />
+                <PropertyColumn Property="x => x.Status" Header="Status" />
+                <TemplateColumn StickyRight="true" Header="Actions">
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Outlined.Clear" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudPaper>
+</MudContainer>
 
 @code {
     private Depts dept = new Depts();
     private string? StatusMessage;
+    private List<Depts> AllDebts = new List<Depts>();
+    private DeptsViewModel deptsViewModel = new DeptsViewModel();
+
+    // Total debt amount
+    private decimal TotalDebts => AllDebts.Sum(d => d.Amount);
+
+    // Pending debts amount
+    private decimal PendingDebts => AllDebts.Where(d => d.Status == Depts.DebtStatus.Pending).Sum(d => d.Amount);
+
+    // Load all debts on initialization
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDebts();
+    }
 
     // Handle form submission asynchronously
     private async Task HandleValidSubmit()
     {
-        // Simulate some database operation (or replace with actual logic)
-        await Task.Delay(500); // Simulate delay
+        try
+        {
+            await deptsViewModel.AddDebt(dept);
+            StatusMessage = "Debt added successfully!";
+            await LoadDebts();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
 
-        // After submission, reset the form
         dept = new Depts(); // Reset the dept model
-        StatusMessage = "Debt added successfully!";
+    }
+
+    // Load all debts from the ViewModel
+    private async Task LoadDebts()
+    {
+        await deptsViewModel.LoadAllDebts();
+        AllDebts = deptsViewModel.AllDebts;
+    }
+
+    // Clear a debt
+    private async Task ClearDebt(int debtId)
+    {
+        try
+        {
+            await deptsViewModel.UpdateDebtStatus(debtId, Depts.DebtStatus.Cleared);
+            StatusMessage = "Debt cleared successfully!";
+            await LoadDebts();
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error: {ex.Message}";
+        }
     }
 }
-
-<style>
-    .dept-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background-color: #f8f9fa;
-        padding: 1rem;
-    }
-
-    .dept-box {
-        background-color: white;
-        padding: 2rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .logo {
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: #333;
-    }
-
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 1.5rem;
-        font-size: 0.9rem;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #4a4a4a;
-            font-size: 0.9rem;
-        }
-
-    .form-control {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 0.9rem;
-        transition: border-color 0.2s ease;
-    }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-    .submit-btn {
-        width: 100%;
-        padding: 0.75rem;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-
-    .status-message {
-        margin-bottom: 1rem;
-        text-align: center;
-    }
-
-        .status-message .mud-text {
-            font-size: 1rem;
-            font-weight: bold;
-        }
-</style>
