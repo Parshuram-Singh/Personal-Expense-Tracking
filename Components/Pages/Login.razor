@@ -5,58 +5,61 @@
 @inject NavigationManager NavigationManager
 @inject UserService UserService
 
-<h1>Login</h1>
+<div class="login-container">
+    <div class="login-box">
+        <h1 class="logo">Login</h1>
 
-@if (!string.IsNullOrEmpty(StatusMessage))
-{
-    <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">
-        @StatusMessage
-    </MudText>
-}
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <div class="status-message">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="mb-4">
+                    @StatusMessage
+                </MudText>
+            </div>
+        }
 
-<EditForm Model="user" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudGrid>
-        <MudItem xs="12" sm="7">
-            <MudCard>
-                <MudCardContent>
-                    <!-- Username -->
-                    <MudTextField Label="Username" HelperText="Max. 8 characters"
-                                  @bind-Value="user.Username" For="@(() => user.Username)" />
+        <EditForm Model="user" OnValidSubmit="OnValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-                    <!-- Password -->
-                    <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                                  @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
+            <!-- Username Input -->
+            <div class="form-group">
+                <MudTextField Label="Username" HelperText="Max. 8 characters"
+                              @bind-Value="user.Username" For="@(() => user.Username)" />
+            </div>
 
-                    <!-- Currency Selection -->
-                    <MudSelect @bind-Value="user.PreferredCurrency" Label="Choose Preferred Currency" Variant="Variant.Outlined" Class="mt-3">
-                        <MudSelectItem Value="@("NPR")">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Flag_of_Nepal.svg/209px-Flag_of_Nepal.svg.png" height="14" class="mr-1" />
-                            NPR (Nepalese Rupee)
-                        </MudSelectItem>
-                        <MudSelectItem Value="@("USD")">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Flag_of_the_United_States_%28Pantone%29.svg/383px-Flag_of_the_United_States_%28Pantone%29.svg.png" height="14" class="mr-1" />
-                            USD (Dollar)
-                        </MudSelectItem>
-                        <MudSelectItem Value="@("EUR")">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/383px-Flag_of_Europe.svg.png" height="14" class="mr-1" />
-                            EUR (Euro)
-                        </MudSelectItem>
-                    </MudSelect>
-                </MudCardContent>
+            <!-- Password Input -->
+            <div class="form-group">
+                <MudTextField Label="Password" HelperText="Choose a strong password"
+                              @bind-Value="user.Password" For="@(() => user.Password)" InputType="InputType.Password" />
+            </div>
 
-                <MudCardActions>
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">
-                        Login
-                    </MudButton>
-                </MudCardActions>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-</EditForm>
+            <!-- Currency Selection -->
+            <div class="form-group">
+                <label for="currency">Preferred Currency</label>
+                <MudSelect @bind-Value="user.PreferredCurrency" Label="Choose Preferred Currency" Variant="Variant.Outlined">
+                    <MudSelectItem Value="@("NPR")">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Flag_of_Nepal.svg/209px-Flag_of_Nepal.svg.png" height="14" class="mr-1" />
+                        NPR (Nepalese Rupee)
+                    </MudSelectItem>
+                    <MudSelectItem Value="@("USD")">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Flag_of_the_United_States_%28Pantone%29.svg/383px-Flag_of_the_United_States_%28Pantone%29.svg.png" height="14" class="mr-1" />
+                        USD (Dollar)
+                    </MudSelectItem>
+                    <MudSelectItem Value="@("EUR")">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Flag_of_Europe.svg/383px-Flag_of_Europe.svg.png" height="14" class="mr-1" />
+                        EUR (Euro)
+                    </MudSelectItem>
+                </MudSelect>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Login</button>
+        </EditForm>
+    </div>
+</div>
 
 @code {
-
     private User user = new User(); // Instance of User class from Models
     private string? StatusMessage { get; set; } // To store the status message
 
@@ -85,7 +88,6 @@
         }
     }
 
-
     protected override void OnInitialized()
     {
         // Ensure a default user exists in the database
@@ -98,3 +100,82 @@
         UserService.EnsureUserExists(defaultUser);
     }
 }
+
+<style>
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        padding: 1rem;
+    }
+
+    .login-box {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .logo {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a4a4a;
+            font-size: 0.9rem;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+    .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+    .status-message {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+        .status-message .mud-text {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+</style>

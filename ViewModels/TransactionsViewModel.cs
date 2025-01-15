@@ -61,5 +61,11 @@ namespace Personal_Expense_Tracking.ViewModels
         {
             return await _transactionsService.GetTotalBalance(); // Fetch total balance from the service
         }
+
+        // Method to get total numbers of transaction
+        public async Task<int> GetTotalNumberOfTransactions()
+        {
+            return await _transactionsService.GetTotalNumberOfTransactions(); // Fetch total number of transaction from the service
+        }
     }
 }

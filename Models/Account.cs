@@ -15,6 +15,7 @@ namespace Personal_Expense_Tracking.Models
         public decimal TotalCredit { get; set; } =0;
         public decimal TotalDebit { get; set; } = 0;
         public decimal TotalDebt { get; set; } = 0;
+        public int TotalNumberOfTransaction { get; set; } = 0;
 
     }
 }

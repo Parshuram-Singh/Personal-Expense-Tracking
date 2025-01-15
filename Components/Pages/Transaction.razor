@@ -3,141 +3,189 @@
 @using Personal_Expense_Tracking.ViewModels
 @inject NavigationManager NavigationManager
 
-<div class="transaction-container">
-    <div class="transaction-box">
-        <h1 class="logo">Add Transaction</h1>
-        <p class="subtitle">Fill in the details below to add a transaction</p>
+<!-- Wrap the entire content in a scrollable div -->
+<div id="scrollable-container" style="height: 90vh; overflow: auto;">
+    <MudContainer Class="mt-5 px-4">
+        <MudGrid>
+            <!-- Left Container for Total Transactions and Total Number of Transactions -->
+            <MudItem xs="12" sm="6">
+                <MudGrid>
+                    <!-- Total Transactions -->
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="p-4" Style="height: 200px;">
+                            <h3>Total Transactions</h3>
+                            <p>@account.Balance</p>
+                        </MudPaper>
+                    </MudItem>
+                    <!-- Total Number of Transactions -->
+                    <MudItem xs="12">
+                        <MudPaper Elevation="2" Class="p-4" Style="height: 200px;">
+                            <h3>Total Number of Transactions</h3>
+                            <p>@account.TotalNumberOfTransaction</p>
+                        </MudPaper>
+                    </MudItem>
+                </MudGrid>
+            </MudItem>
 
-        <!-- Form submission handler -->
-        <EditForm Model="@transaction" OnValidSubmit="HandleValidSubmitAsync">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+            <!-- Right Container for the Form -->
+            <MudItem xs="12" sm="6">
+                <MudPaper Elevation="2" Class="p-4" Style="height: 100%;">
+                    <h1 class="text-center fs-2 fw-bold mb-3">Add Transaction</h1>
+                    <p class="text-center text-muted mb-3 fs-6">Fill in the details below to add a transaction</p>
 
-            <!-- Date and Time Input (Use HTML input instead of InputText) -->
-            <div class="form-group">
-                <label for="date-time">Transaction Date and Time</label>
-                <input id="date-time" @bind="transaction.Date" type="datetime-local" class="form-control" disabled />
-            </div>
+                    @if (!string.IsNullOrEmpty(StatusMessage))
+                    {
+                        <div class="status-message text-center mb-3">
+                            <MudText Typo="Typo.h6" Color="@(StatusMessage.Contains("success") ? Color.Success : Color.Error)" Class="mb-4">
+                                @StatusMessage
+                            </MudText>
+                        </div>
+                    }
 
-            <!-- Remarks Input -->
-            <div class="form-group">
-                <label for="remarks">Remarks</label>
-                <InputText id="remarks" @bind-Value="transaction.Remarks" class="form-control" placeholder="Enter transaction remarks" required />
-            </div>
+                    <!-- Form submission handler -->
+                    <EditForm Model="@transaction" OnValidSubmit="HandleValidSubmitAsync">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
 
-            <!-- Transaction Type Input -->
-            <div class="form-group">
-                <label for="type">Transaction Type</label>
-                <select id="type" @bind="transaction.Type" class="form-control" required>
-                    <option value="Credit">Credit</option>
-                    <option value="Debit">Debit</option>
-                    <option value="Debt">Debt</option>
-                </select>
-            </div>
+                        <!-- Date and Time Input (Use HTML input instead of InputText) -->
+                        <div class="mb-3">
+                            <label for="date-time" class="form-label">Transaction Date and Time</label>
+                            <input id="date-time" @bind="transaction.Date" type="datetime-local" class="form-control" />
+                        </div>
+                        <!-- Remarks Input -->
+                        <div class="mb-3">
+                            <label for="remarks" class="form-label">Notes</label>
+                            <InputText id="remarks" @bind-Value="transaction.Notes" class="form-control" placeholder="e.g This is for office supplies" />
+                        </div>
+                        <!-- Transaction Type Input -->
+                        <div class="mb-3">
+                            <label for="type" class="form-label">Transaction Type</label>
+                            <select id="type" @bind="transaction.Type" class="form-select" required>
+                                <option value="Credit">Credit</option>
+                                <option value="Debit">Debit</option>
+                            </select>
+                        </div>
+                        <!-- Tag Input -->
+                        <div class="mb-3">
+                            <label for="tag" class="form-label">Tag</label>
+                            <InputText id="tag" @bind-Value="transaction.Tag" class="form-control" placeholder="Enter transaction tag" required />
+                        </div>
+                        <!-- Amount Input -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Amount</label>
+                            <InputNumber id="amount" @bind-Value="transaction.Amount" class="form-control" placeholder="Enter amount" required />
+                        </div>
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">Add Transaction</button>
+                    </EditForm>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
 
-            <!-- Tag Input -->
-            <div class="form-group">
-                <label for="tag">Tag</label>
-                <InputText id="tag" @bind-Value="transaction.Tag" class="form-control" placeholder="Enter transaction tag" required />
-            </div>
+        <!-- Transaction List (Full Width) -->
+        <MudGrid>
+            <MudItem xs="12">
+                <MudPaper Elevation="2" Class="p-4 mt-5 mb-5">
+                    <h3 class="text-center mb-4">Transaction List</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Date</th>
+                                    <th>Notes</th>
+                                    <th>Type</th>
+                                    <th>Tags</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var transaction in transactionsViewModel.AllTransactions)
+                                {
+                                    <tr>
+                                        <td>@transaction.Id</td>
+                                        <td>@transaction.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>@transaction.Notes</td>
+                                        <td>@transaction.Type</td>
+                                        <td>@transaction.Tag</td>
+                                        <td>@transaction.Amount.ToString("C")</td>
+                                        <td>@transaction.Status</td>
+                                        <td>
+                                            <button class="btn btn-danger" @onclick="() => DeleteTransaction(transaction.Id)">Delete</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </MudPaper>
+            </MudItem>
+        </MudGrid>
+    </MudContainer>
 
-            <!-- Amount Input -->
-            <div class="form-group">
-                <label for="amount">Amount</label>
-                <InputNumber id="amount" @bind-Value="transaction.Amount" class="form-control" placeholder="Enter amount" required />
-            </div>
-
-            <!-- Submit Button -->
-            <button type="submit" class="submit-btn">Add Transaction</button>
-        </EditForm>
-    </div>
+    
 </div>
 
 @code {
-    private Transactions transaction = new Transactions(); // Bind this to the form
-    private TransactionsViewModel transactionsViewModel = new TransactionsViewModel(); // ViewModel for transactions
+    private Transactions transaction = new Transactions();
+    private TransactionsViewModel transactionsViewModel = new TransactionsViewModel();
+    private Account account = new Account();
+    private string? StatusMessage;
+    private List<Transactions> transactions;
+    Color Color = Color.Success;
 
-    // Handle form submission asynchronously
+    protected override async Task OnInitializedAsync()
+    {
+        transactions = await transactionsViewModel.GetTransactions();
+        await GetTotalTransactionsCount();
+    }
+
+    private async Task GetAccountDetails()
+    {
+        account.Balance = await transactionsViewModel.GetTotalBalance();
+    }
+
+    private async Task GetTotalTransactionsCount()
+    {
+        account.TotalNumberOfTransaction = await transactionsViewModel.GetTotalNumberOfTransactions();
+    }
+
     private async Task HandleValidSubmitAsync()
     {
-        // Add the transaction to the database asynchronously
+        await GetAccountDetails();
+
+        if (transaction.Type == TransactionsType.Debit && transaction.Amount > account.Balance)
+        {
+            StatusMessage = "Insufficient balance. Please enter a valid amount.";
+            transaction = new Transactions();
+            StateHasChanged();
+            await Task.Delay(2000);
+            StatusMessage = null;
+            StateHasChanged();
+            return;
+        }
+
         await transactionsViewModel.AddTransaction(transaction);
-
-        // Optionally, clear the form after submission
+        transactions = await transactionsViewModel.GetTransactions();
+        await GetTotalTransactionsCount();
+        await GetAccountDetails();
         transaction = new Transactions();
+        StatusMessage = "Transaction added successfully!";
+        StateHasChanged();
+        await Task.Delay(2000);
+        StatusMessage = null;
+        StateHasChanged();
     }
+
+    private async Task DeleteTransaction(int transactionId)
+    {
+        await transactionsViewModel.DeleteTransaction(transactionId);
+        transactions = await transactionsViewModel.GetTransactions();
+        await GetTotalTransactionsCount();
+        await GetAccountDetails();
+    }
+
+    
 }
-
-<style>
-    .transaction-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        background-color: #f8f9fa;
-        padding: 1rem;
-    }
-
-    .transaction-box {
-        background-color: white;
-        padding: 2.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        width: 100%;
-        max-width: 500px;
-    }
-
-    .logo {
-        text-align: center;
-        font-size: 2rem;
-        font-weight: 700;
-        margin-bottom: 1rem;
-        color: #1a1a1a;
-    }
-
-    .subtitle {
-        text-align: center;
-        color: #666;
-        margin-bottom: 2rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.5rem;
-    }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #4a4a4a;
-            font-size: 0.9rem;
-        }
-
-    .form-control {
-        width: 100%;
-        padding: 0.75rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1rem;
-        transition: border-color 0.2s;
-    }
-
-        .form-control:focus {
-            outline: none;
-            border-color: #007bff;
-        }
-
-    .submit-btn {
-        width: 100%;
-        padding: 1rem;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-</style>

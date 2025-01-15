@@ -1,0 +1,152 @@
+﻿@page "/dept"
+@using Personal_Expense_Tracking.Models
+@using Personal_Expense_Tracking.ViewModels
+@inject NavigationManager NavigationManager
+
+<div class="dept-container">
+    <div class="dept-box">
+        <h1 class="logo">Add Debt</h1>
+        <p class="subtitle">Fill in the details below to add a debt</p>
+
+        @if (!string.IsNullOrEmpty(StatusMessage))
+        {
+            <div class="status-message">
+                <MudText Typo="Typo.h6" Color="@(StatusMessage.Contains("success") ? Color.Success : Color.Error)" Class="mb-4">
+                    @StatusMessage
+                </MudText>
+            </div>
+        }
+
+        <EditForm Model="@dept" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <!-- Source Input -->
+            <div class="form-group">
+                <label for="source">Source</label>
+                <InputText id="source" @bind-Value="dept.Source" class="form-control" placeholder="Enter debt source" required />
+            </div>
+
+            <!-- Amount Input -->
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <InputNumber id="amount" @bind-Value="dept.Amount" class="form-control" placeholder="Enter amount" required />
+            </div>
+
+            <!-- Due Date and Time Input -->
+            <div class="form-group">
+                <label for="due-date-time">Due Date and Time</label>
+                <input id="due-date-time" @bind="dept.DueDate" type="datetime-local" class="form-control" />
+            </div>
+
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">Add Debt</button>
+        </EditForm>
+
+
+
+    </div>
+</div>
+
+@code {
+    private Depts dept = new Depts();
+    private string? StatusMessage;
+
+    // Handle form submission asynchronously
+    private async Task HandleValidSubmit()
+    {
+        // Simulate some database operation (or replace with actual logic)
+        await Task.Delay(500); // Simulate delay
+
+        // After submission, reset the form
+        dept = new Depts(); // Reset the dept model
+        StatusMessage = "Debt added successfully!";
+    }
+}
+
+<style>
+    .dept-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+        padding: 1rem;
+    }
+
+    .dept-box {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .logo {
+        text-align: center;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #333;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #4a4a4a;
+            font-size: 0.9rem;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s ease;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+    .submit-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+
+    .status-message {
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+        .status-message .mud-text {
+            font-size: 1rem;
+            font-weight: bold;
+        }
+</style>

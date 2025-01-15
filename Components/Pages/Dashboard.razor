@@ -3,90 +3,94 @@
 @using Personal_Expense_Tracking.Models
 @inject NavigationManager NavigationManager
 
-<h3>Dashboard</h3>
+<MudContainer Class="mt-5" MaxWidth="MaxWidth.False">
+    <h3>Dashboard</h3>
 
-<MudGrid>
-    <MudItem xs="12" class="d-flex justify-end mb-4">
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" startIcon="@Icons.Material.Filled.Add" OnClick="NavigateToTransactionPage">
-            New Transaction
-        </MudButton>
-    </MudItem>
-    <MudItem xs="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
-            <div>
-                <h4>Total Balance</h4>
-                <MudText Typo="Typo.h6">$@account.Balance</MudText>
-            </div>
-        </MudPaper>
-    </MudItem>
+    <!-- Dashboard Stats (Total Balance, Income, Expense, Pending Debts) -->
+    <MudGrid class="mt-5" Justify="Justify.SpaceBetween">
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="border-solid border-2 mud-border-primary pa-4 rounded-tl-xl" Elevation="2">
+                <div class="mud-theme-info py-4 px-6 mx-4 rounded-tl-xl">
+                    <MudText Align="Align.Center">Total Balance</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.Balance</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
 
-    <MudItem xs="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
-            <div>
-                <h4>Income</h4>
-                <MudText Typo="Typo.h6">$@account.TotalCredit</MudText>
-            </div>
-        </MudPaper>
-    </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="border-solid border-2 mud-border-primary pa-4 rounded-tr-xl" Elevation="2">
+                <div class="mud-theme-tertiary py-4 px-6 mx-4 rounded-tr-xl">
+                    <MudText Align="Align.Center">Income</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.TotalCredit</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
 
-    <MudItem xs="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
-            <div>
-                <h4>Expense</h4>
-                <MudText Typo="Typo.h6">$@account.TotalDebit</MudText>
-            </div>
-        </MudPaper>
-    </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="border-solid border-2 mud-border-primary pa-4 rounded-br-xl" Elevation="2">
+                <div class="mud-theme-secondary py-4 px-6 mx-4 rounded-br-xl">
+                    <MudText Align="Align.Center">Expense</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.TotalDebit</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
 
-    <MudItem xs="3">
-        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" Outlined="true" Elevation="2">
-            <div>
-                <h4>Pending Debts</h4>
-                <MudText Typo="Typo.h6">$@account.TotalDebt</MudText>
-            </div>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+        <MudItem xs="12" sm="6" md="3">
+            <MudPaper Class="border-solid border-2 mud-border-primary pa-4 rounded-bl-xl" Elevation="2">
+                <div class="mud-theme-primary py-4 px-6 mx-4 rounded-bl-xl">
+                    <MudText Align="Align.Center">Pending Debts</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.TotalDebt</MudText>
+                </div>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-<div class="container mt-5">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Date</th>
-                <th>Remarks</th>
-                <th>Type</th>
-                <th>Tags</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Actions</th> <!-- Added a new column for actions -->
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var transaction in transactionsViewModel.AllTransactions)
-            {
-                <tr>
-                    <td>@transaction.Id</td>
-                    <td>@transaction.Date.ToString("yyyy-MM-dd HH:mm")</td> <!-- Show date with time -->
-                    <td>@transaction.Remarks</td>
-                    <td>@transaction.Type</td>
-                    <td>@transaction.Tag</td>
-                    <td>@transaction.Amount.ToString("C")</td>
-                    <td>@transaction.Status</td>
-                    <td>
-                        <!-- Delete button -->
-                        <button class="btn btn-danger" @onclick="() => DeleteTransaction(transaction.Id)">Delete</button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+    <!-- Transaction List Section -->
+    <MudGrid class="mt-5">
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="p-4">
+                <h3 class="text-center mb-4">Transaction List</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Date</th>
+                                <th>Notes</th>
+                                <th>Type</th>
+                                <th>Tags</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var transaction in transactionsViewModel.AllTransactions)
+                            {
+                                <tr>
+                                    <td>@transaction.Id</td>
+                                    <td>@transaction.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@transaction.Notes</td>
+                                    <td>@transaction.Type</td>
+                                    <td>@transaction.Tag</td>
+                                    <td>@transaction.Amount.ToString("C")</td>
+                                    <td>@transaction.Status</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
 
 @code {
     private Account account = new Account();
     private List<Transactions> transactions;
     private TransactionsViewModel transactionsViewModel = new TransactionsViewModel();
+
+    // Define the StatusMessage variable
+    private string? StatusMessage;
 
     protected override async Task OnInitializedAsync()
     {
@@ -101,22 +105,12 @@
         account.TotalCredit = await transactionsViewModel.GetTotalInflow();
         account.TotalDebit = await transactionsViewModel.GetTotalOutflow();
         account.Balance = await transactionsViewModel.GetTotalBalance();
-        account.TotalDebt = account.TotalDebit - account.TotalCredit; 
+        //account.TotalDebt = account.TotalDebit - account.TotalCredit;
     }
 
     private void NavigateToTransactionPage()
     {
         // Navigate to the transaction page
         NavigationManager.NavigateTo("/transaction");
-    }
-
-    private async Task DeleteTransaction(int transactionId)
-    {
-        // Call the async method in your ViewModel to delete the transaction by Id
-        await transactionsViewModel.DeleteTransaction(transactionId);
-
-        // Refresh the transaction list asynchronously after deletion
-        transactions = await transactionsViewModel.GetTransactions();
-        await GetDashboardTotals(); // Re-fetch dashboard totals after deletion
     }
 }

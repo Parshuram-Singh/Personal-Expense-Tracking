@@ -118,22 +118,49 @@ namespace Personal_Expense_Tracking.Services
                 try
                 {
                     db.CreateTable<Transactions>();
+                    db.CreateTable<Depts>();  // Ensure the Depts table is also created.
 
+                    // Calculate total inflows (Credits)
                     var totalInflow = await Task.Run(() =>
                         db.Table<Transactions>()
                           .Where(t => t.Type == TransactionsType.Credit)
                           .Sum(t => t.Amount));
 
+                    // Calculate total outflows (Debits)
                     var totalOutflow = await Task.Run(() =>
                         db.Table<Transactions>()
                           .Where(t => t.Type == TransactionsType.Debit)
                           .Sum(t => t.Amount));
 
-                    return totalInflow - totalOutflow;
+                    // Calculate total debts (only Pending debts, if applicable)
+                    var totalDebt = await Task.Run(() =>
+                        db.Table<Depts>()
+                          .Where(d => d.Status == Depts.DebtStatus.Pending) // Only include pending debts
+                          .Sum(d => d.Amount));
+
+                    // Balance formula: (inflows + debts) - outflows
+                    return (totalInflow + totalDebt) - totalOutflow;
                 }
                 catch (SQLiteException ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Error calculating total balance: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+        public async Task<int> GetTotalNumberOfTransactions()
+        {
+            using (var db = DataConfig.GetDatabaseConnection())
+            {
+                try
+                {
+                    db.CreateTable<Transactions>();
+                    System.Diagnostics.Debug.WriteLine($"Transactions count: ");
+                    return await Task.Run(() => db.Table<Transactions>().Count());
+                }
+                catch (SQLiteException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error calculating total number of transactions: {ex.Message}");
                     throw;
                 }
             }

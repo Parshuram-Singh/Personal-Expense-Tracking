@@ -5,19 +5,46 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    <!-- Main Layout -->
+    <MudLayout>
+        <!-- Application Bar -->
+        <MudAppBar Elevation="1">
+            <!-- Menu Button to toggle drawer -->
+            <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                           Color="Color.Inherit"
+                           Edge="Edge.Start"
+                           OnClick="@DrawerToggle" />
+            <!-- Application Title -->
+            <MudText Typo="Typo.h5" Class="ml-3">Expense Tracking System</MudText>
 
-    <main>
-        <div class="top-row px-4">
+            <MudSpacer /> <!-- Pushes content to the right -->
+            <!-- Additional Options Button -->
+            <MudIconButton Icon="@Icons.Material.Filled.MoreVert"
+                           Color="Color.Inherit"
+                           Edge="Edge.End" />
+        </MudAppBar>
 
-            @* profile section  *@
-        </div>
+        <!-- Side Drawer -->
+        <MudDrawer @bind-Open="_drawerOpen"
+                   ClipMode="DrawerClipMode.Always"
+                   Elevation="2">
+            <NavMenu /> <!-- Placeholder for navigation menu -->
+        </MudDrawer>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <!-- Main Content -->
+        <MudMainContent>
+            @Body <!-- Page-specific content will be injected here -->
+        </MudMainContent>
+    </MudLayout>
+
+
+@code {
+    // State to manage drawer visibility
+    private bool _drawerOpen = true;
+
+    // Toggle method for the side drawer
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+}
