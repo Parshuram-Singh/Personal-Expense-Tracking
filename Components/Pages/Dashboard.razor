@@ -39,66 +39,79 @@
             <MudPaper Class="border-solid border-2 mud-border-primary pa-4 rounded-bl-xl" Elevation="2">
                 <div class="mud-theme-primary py-4 px-6 mx-4 rounded-bl-xl">
                     <MudText Align="Align.Center">Pending Debts</MudText>
-                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.TotalDebt</MudText>
+                    <MudText Typo="Typo.h6" Align="Align.Center">$@account.PendingDebt</MudText>
                 </div>
             </MudPaper>
         </MudItem>
     </MudGrid>
 
-    <!-- Transaction List Section -->
-    <MudGrid class="mt-5">
-        <MudItem xs="12">
-            <MudPaper Elevation="2" Class="p-4">
-                <h3 class="text-center mb-4">Transaction List</h3>
-                <div class="table-responsive">
+    
 
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Date</th>
-                                <th>Notes</th>
-                                <th>Type</th>
-                                <th>Tags</th>
-                                <th>Amount</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var transaction in transactionsViewModel.AllTransactions)
-                            {
-                                <tr>
-                                    <td>@transaction.Id</td>
-                                    <td>@transaction.Date.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td>@transaction.Notes</td>
-                                    <td>@transaction.Type</td>
-                                    <td>@transaction.Tag</td>
-                                    <td>@transaction.Amount.ToString("C")</td>
-                                    <td>@transaction.Status</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </MudPaper>
-        </MudItem>
-    </MudGrid>
+    <!-- Button to Add a Transaction -->
+    <MudItem xs="12" sm="12" md="12" Class="d-flex justify-content-end">
+        <MudButton OnClick="NavigateToAddTransactionPage" Color="Color.Primary" Variant="Variant.Filled">
+            Add Transaction
+        </MudButton>
+    </MudItem>
+
+    <!-- Transactions Table and Search -->
+    <MudPaper Elevation="2" Class="p-4">
+        <h3 class="text-center mb-4">Transaction List</h3>
+
+        <!-- Search Bar -->
+        <MudTextField Label="Search by Title"
+                      @bind-Value="searchQuery"
+                      Adornment="Adornment.Start"
+                      Icon="search"
+                      Immediate="true"
+                      OnKeyUp="OnSearch" />
+
+        <div class="table-responsive">
+            <MudTable Items="filteredTransactions" Hover="true">
+                <HeaderContent>
+                    <MudTh Sortable="true">Id</MudTh>
+                    <MudTh Sortable="true">Date</MudTh>
+                    <MudTh Sortable="true">Title</MudTh>
+                    <MudTh Sortable="true">Notes</MudTh>
+                    <MudTh Sortable="true">Type</MudTh>
+                    <MudTh Sortable="true">Tags</MudTh>
+                    <MudTh Sortable="true">Amount</MudTh>
+                    <MudTh Sortable="true">Status</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>@context.Id</MudTd>
+                    <MudTd>@context.Date.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                    <MudTd>@GetHighlightedTitle(@context.Title)</MudTd> <!-- Highlighted Title -->
+                    <MudTd>@context.Notes</MudTd>
+                    <MudTd>@context.Type</MudTd>
+                    <MudTd>@context.Tag</MudTd>
+                    <MudTd>@context.Amount.ToString("C")</MudTd>
+                    <MudTd>@context.Status</MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+    </MudPaper>
 </MudContainer>
 
 @code {
+    private string searchQuery = string.Empty;
     private Account account = new Account();
-    private List<Transactions> transactions;
+    private List<Transactions> transactions = new List<Transactions>();
+    private List<Transactions> filteredTransactions = new List<Transactions>();
     private TransactionsViewModel transactionsViewModel = new TransactionsViewModel();
-
-    // Define the StatusMessage variable
-    private string? StatusMessage;
+    private DeptsViewModel deptsViewModel = new DeptsViewModel();
+    private double[] creditDebitData = { 0, 0 }; // Data for Credit and Debit
+    private string[] creditDebitLabels = { "Credit", "Debit" }; // Labels for the Donut Chart
 
     protected override async Task OnInitializedAsync()
     {
         // Fetch transactions and account totals
         transactions = await transactionsViewModel.GetTransactions();
+        filteredTransactions = transactions; // Initialize filtered transactions
+        System.Diagnostics.Debug.WriteLine($"Fetched {transactions.Count} transactions.");
         await GetDashboardTotals();
     }
+
 
     private async Task GetDashboardTotals()
     {
@@ -106,12 +119,63 @@
         account.TotalCredit = await transactionsViewModel.GetTotalInflow();
         account.TotalDebit = await transactionsViewModel.GetTotalOutflow();
         account.Balance = await transactionsViewModel.GetTotalBalance();
-        //account.TotalDebt = account.TotalDebit - account.TotalCredit;
+        // Fetch the total debt amount
+        decimal totalDebt = await deptsViewModel.GetTotalDebtAmount();
+        account.PendingDebt = totalDebt;
+
+        // Update the chart data
+        creditDebitData[0] = (double)account.TotalCredit;
+        creditDebitData[1] = (double)account.TotalDebit;
     }
 
-    private void NavigateToTransactionPage()
+    private void NavigateToAddTransactionPage()
     {
-        // Navigate to the transaction page
+        // Navigate to the page where users can add a transaction
         NavigationManager.NavigateTo("/transaction");
     }
+
+    private void OnSearch()
+    {
+        searchQuery = searchQuery?.Trim(); // Trim the search query
+
+        if (string.IsNullOrEmpty(searchQuery))
+        {
+            filteredTransactions = transactions;
+        }
+        else
+        {
+            filteredTransactions = transactions
+                .Where(t => !string.IsNullOrEmpty(t.Title) && t.Title.Trim().Contains(searchQuery, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+        }
+
+        StateHasChanged(); // Trigger re-rendering of the UI
+    }
+
+    // Method to highlight the matched text in the title
+    private MarkupString GetHighlightedTitle(string title)
+    {
+        if (string.IsNullOrEmpty(searchQuery) || string.IsNullOrEmpty(title))
+        {
+            return new MarkupString(title); // Return the title as it is if no search query or title is empty
+        }
+
+        var matchStartIndex = title.IndexOf(searchQuery, StringComparison.OrdinalIgnoreCase);
+
+        if (matchStartIndex == -1)
+        {
+            return new MarkupString(title); // No match found, return the title as is
+        }
+
+        var beforeMatch = title.Substring(0, matchStartIndex);
+        var matchedText = title.Substring(matchStartIndex, searchQuery.Length);
+        var afterMatch = title.Substring(matchStartIndex + searchQuery.Length);
+
+        // Highlight matched text with a span
+        return new MarkupString($"{beforeMatch}<span style='background-color: yellow;'>{matchedText}</span>{afterMatch}");
+    }
+
+
+
+
 }

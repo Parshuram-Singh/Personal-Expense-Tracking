@@ -25,67 +25,81 @@ namespace Personal_Expense_Tracking.ViewModels
         // Method to add a debt (Asynchronous)
         public async Task AddDebt(Depts debt)
         {
-            await _deptService.InsertDebt(debt); // Call async method in service
-        }
-
-        // Method to retrieve all debts (Asynchronous)
-        public async Task LoadAllDebts()
-        {
-            using (var db = DataConfig.GetDatabaseConnection())
+            try
             {
-                try
-                {
-                    db.CreateTable<Depts>();
-                    AllDebts = await Task.Run(() => db.Table<Depts>().ToList());
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error loading debts: {ex.Message}");
-                    throw;
-                }
+                await _deptService.InsertDebt(debt); // Call async method in service to insert debt
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error adding debt: {ex.Message}");
+                throw;
             }
         }
 
-        // Method to update debt status
+        // Method to load all debts from the service (Asynchronous)
+        public async Task LoadAllDebts()
+        {
+            try
+            {
+                AllDebts = await _deptService.GetAllDebts(); // Fetch all debts using service
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error loading debts: {ex.Message}");
+                throw;
+            }
+        }
+
+        // Method to update a debt status (Asynchronous)
         public async Task UpdateDebtStatus(int debtId, Depts.DebtStatus newStatus)
         {
-            using (var db = DataConfig.GetDatabaseConnection())
+            try
             {
-                try
+                // Get the debt by ID
+                var debt = await _deptService.GetDebtById(debtId);
+                if (debt != null)
                 {
-                    var debtToUpdate = db.Find<Depts>(debtId);
-                    if (debtToUpdate != null)
-                    {
-                        debtToUpdate.Status = newStatus;
-                        await Task.Run(() => db.Update(debtToUpdate));
-                    }
+                    debt.Status = newStatus; // Update the status
+                    await _deptService.UpdateDebt(debt); // Update the debt in the service
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error updating debt status: {ex.Message}");
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating debt status: {ex.Message}");
+                throw;
             }
         }
 
         // Method to delete a debt (Asynchronous)
         public async Task DeleteDebt(int debtId)
         {
-            using (var db = DataConfig.GetDatabaseConnection())
+            try
             {
-                try
+                // Get the debt by ID
+                var debt = await _deptService.GetDebtById(debtId);
+                if (debt != null)
                 {
-                    var debtToDelete = db.Find<Depts>(debtId);
-                    if (debtToDelete != null)
-                    {
-                        await Task.Run(() => db.Delete(debtToDelete));
-                    }
+                    await _deptService.DeleteDebt(debt); // Delete the debt using the service
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error deleting debt: {ex.Message}");
-                    throw;
-                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error deleting debt: {ex.Message}");
+                throw;
+            }
+        }
+
+        // Method to get the total debt amount (Asynchronous)
+        public async Task<decimal> GetTotalDebtAmount()
+        {
+            try
+            {
+                return await _deptService.GetTotalDeptAmount(); // Call service to get the total debt amount
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error calculating total debt amount: {ex.Message}");
+                throw;
             }
         }
     }

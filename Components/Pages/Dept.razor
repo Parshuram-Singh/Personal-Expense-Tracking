@@ -73,23 +73,44 @@
     </MudGrid>
 
     <!-- Debts List -->
-    <MudPaper Elevation="2" Class="pa-4 mt-4">
-        <h2 class="text-center">Manage Debts</h2>
-        <MudDataGrid Items="@AllDebts" HorizontalScrollbar="true" Bordered="true" Dense="true">
-            <Columns>
-                <PropertyColumn Property="x => x.Id" Header="Id" />
-                <PropertyColumn Property="x => x.Source" Header="Source" />
-                <PropertyColumn Property="x => x.Amount" Header="Amount" />
-                <PropertyColumn Property="x => x.DueDate" Header="Due Date" />
-                <PropertyColumn Property="x => x.Status" Header="Status" />
-                <TemplateColumn StickyRight="true" Header="Actions">
-                    <CellTemplate>
-                        <MudIconButton Icon="@Icons.Material.Outlined.Clear" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-        </MudDataGrid>
-    </MudPaper>
+    <!-- Debts List (Full Width) -->
+<MudGrid>
+    <MudItem xs="12">
+        <MudPaper Elevation="2" Class="p-4 mt-5 mb-5">
+            <h3 class="text-center mb-4">Debt List</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Source</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var debt in AllDebts)
+                        {
+                            <tr>
+                                <td>@debt.Id</td>
+                                <td>@debt.Source</td>
+                                <td>@debt.Amount.ToString("C")</td>
+                                <td>@debt.DueDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@debt.Status</td>
+                                <td>
+                                    <button class="btn btn-danger" @onclick="() => DeleteDebtAsync(debt.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
 </MudContainer>
 
 @code {
@@ -130,22 +151,29 @@
     // Load all debts from the ViewModel
     private async Task LoadDebts()
     {
-        await deptsViewModel.LoadAllDebts();
-        AllDebts = deptsViewModel.AllDebts;
+        try
+        {
+            await deptsViewModel.LoadAllDebts();
+            AllDebts = deptsViewModel.AllDebts;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error loading debts: {ex.Message}";
+        }
     }
 
-    // Clear a debt
-    private async Task ClearDebt(int debtId)
+    // Delete a debt
+    private async Task DeleteDebtAsync(int debtId)
     {
         try
         {
-            await deptsViewModel.UpdateDebtStatus(debtId, Depts.DebtStatus.Cleared);
-            StatusMessage = "Debt cleared successfully!";
+            await deptsViewModel.DeleteDebt(debtId);
+            StatusMessage = "Debt deleted successfully!";
             await LoadDebts();
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Error: {ex.Message}";
+            StatusMessage = $"Error deleting debt: {ex.Message}";
         }
     }
 }

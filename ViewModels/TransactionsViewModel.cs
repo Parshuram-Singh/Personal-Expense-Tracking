@@ -10,13 +10,15 @@ namespace Personal_Expense_Tracking.ViewModels
     public class TransactionsViewModel
     {
         private TransactionsService _transactionsService;
+        private BalanceService _balanceService; // Declare BalanceService
 
         // This property will hold all transactions
         public List<Transactions> AllTransactions { get; set; }
 
         public TransactionsViewModel()
         {
-            _transactionsService = new TransactionsService();
+            _transactionsService = new TransactionsService(); // Initialize TransactionsService
+            _balanceService = new BalanceService(); // Initialize BalanceService
             AllTransactions = new List<Transactions>(); // Initialize as an empty list
         }
 
@@ -39,12 +41,10 @@ namespace Personal_Expense_Tracking.ViewModels
         // Method to fetch all transactions (Asynchronous)
         public async Task<List<Transactions>> GetTransactions()
         {
-            // Fetch the transactions from the service asynchronously and assign them to the property
             AllTransactions = await _transactionsService.GetAllTransactions();
             return AllTransactions;
         }
 
-        // Method to get total inflow
         public async Task<decimal> GetTotalInflow()
         {
             return await _transactionsService.GetTotalInflow(); // Fetch total inflow from the service
@@ -59,7 +59,7 @@ namespace Personal_Expense_Tracking.ViewModels
         // Method to get total balance
         public async Task<decimal> GetTotalBalance()
         {
-            return await _transactionsService.GetTotalBalance(); // Fetch total balance from the service
+            return await _balanceService.GetTotalBalance(); // Fetch total balance from the service
         }
 
         // Method to get total numbers of transaction

@@ -52,11 +52,17 @@
                             <label for="date-time" class="form-label">Transaction Date and Time</label>
                             <input id="date-time" @bind="transaction.Date" type="datetime-local" class="form-control" />
                         </div>
-                        <!-- Remarks Input -->
+                        <!-- Title Input -->
+                        <div class="mb-3">
+                            <label for="remarks" class="form-label">Title</label>
+                            <InputText id="remarks" @bind-Value="transaction.Title" class="form-control" placeholder="e.g office supplies" />
+                        </div>
+                         <!-- Remarks Input -->
                         <div class="mb-3">
                             <label for="remarks" class="form-label">Notes</label>
                             <InputText id="remarks" @bind-Value="transaction.Notes" class="form-control" placeholder="e.g This is for office supplies" />
                         </div>
+                        
                         <!-- Transaction Type Input -->
                         <div class="mb-3">
                             <label for="type" class="form-label">Transaction Type</label>

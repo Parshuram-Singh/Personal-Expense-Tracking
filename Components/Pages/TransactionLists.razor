@@ -1,0 +1,46 @@
+﻿@page "/ppp"
+@using MudBlazor
+@using Personal_Expense_Tracking.Models
+@using Personal_Expense_Tracking.ViewModels
+@inject TransactionsViewModel transactionsViewModel
+@inject NavigationManager NavigationManager
+
+<MudPaper Elevation="2" Class="p-4">
+    <h3 class="text-center mb-4">Transaction List</h3>
+    <div class="table-responsive">
+        <MudTable Items="transactionsViewModel.AllTransactions" Hover="true">
+            <HeaderContent>
+                <MudTh>Id</MudTh>
+                <MudTh>Date</MudTh>
+                <MudTh>Notes</MudTh>
+                <MudTh>Type</MudTh>
+                <MudTh>Tags</MudTh>
+                <MudTh>Amount</MudTh>
+                <MudTh>Status</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Id</MudTd>
+                <MudTd>@context.Date.ToString("yyyy-MM-dd HH:mm")</MudTd>
+                <MudTd>@context.Notes</MudTd>
+                <MudTd>@context.Type</MudTd>
+                <MudTd>@context.Tag</MudTd>
+                <MudTd>@context.Amount.ToString("C")</MudTd>
+                <MudTd>@context.Status</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </div>
+</MudPaper>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch transactions asynchronously when the component is initialized
+        await transactionsViewModel.GetTransactions();
+    }
+
+    private void NavigateToTransactionPage(int transactionId)
+    {
+        // Navigate to the details page of a specific transaction (optional)
+        NavigationManager.NavigateTo($"/transaction/{transactionId}");
+    }
+}

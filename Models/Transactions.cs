@@ -8,7 +8,7 @@ namespace Personal_Expense_Tracking.Models
     {
         [PrimaryKey, AutoIncrement ,NotNull]
         public int Id { get; set; } // Primary Key, will auto-increment
-
+        public string Title { get; set; }
         public string Notes { get; set; } = string.Empty; // Additional remarks about the transaction
         public TransactionsType Type { get; set; } // Enum for transaction type
         public decimal Amount { get; set; } // Use decimal for currency precision

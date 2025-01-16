@@ -27,15 +27,11 @@ namespace Personal_Expense_Tracking.Services
 
                 if (existingUser == null)
                 {
-                    System.Diagnostics.Debug.WriteLine("User not found. Creating a new user.");
                     _db.Insert(user); // Insert new user
-                    System.Diagnostics.Debug.WriteLine("New user created.");
                 }
                 else
                 {
-                    System.Diagnostics.Debug.WriteLine("User already exists.");
                     // Fetch and print username and password from the database
-                    System.Diagnostics.Debug.WriteLine($"Fetched from DB - Username: {existingUser.Username}, Password: {existingUser.Password}");
 
                     // Validate user credentials
                     if (VerifyUserCredentials(user.Username, user.Password))

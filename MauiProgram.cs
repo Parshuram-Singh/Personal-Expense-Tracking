@@ -24,10 +24,9 @@ namespace Personal_Expense_Tracking
             builder.Services.AddScoped<UserService>();
 
 
-
-
             // Add MudBlazor services
             builder.Services.AddMudServices();  // Registers MudBlazor services
+
 
 #if DEBUG
             builder.Services.AddBlazorWebViewDeveloperTools();  // Enable developer tools in Debug mode
