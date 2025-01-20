@@ -1,7 +1,92 @@
 ﻿@page "/importExport"
 
-<h3>importExport</h3>
+<h3>Import/Export Data</h3>
+
+<MudGrid class="mt-5" Justify="Justify.SpaceBetween" Spacing="2">
+
+    <!-- Import & Export for Transactions -->
+    <MudItem xs="12" sm="4" md="4">
+        <div class="mud-theme-info py-4 px-6 mx-4 rounded-tl-xl shadow-lg">
+            <MudText Align="Align.Center" Variant="Variant.H6">Transactions</MudText>
+
+            <!-- Import Button -->
+            <MudButton OnClick="ImportTransactions" FullWidth="true" Variant="Variant.Filled" Size="Size.Large" StartIcon="Icons.Material.Filled.Upload" Tooltip="Import transaction data">
+                Import Transactions
+            </MudButton>
+
+            <!-- Export Button -->
+            <MudButton OnClick="ExportTransactions" FullWidth="true" Variant="Variant.Filled" Size="Size.Large" StartIcon="Icons.Material.Filled.Download" Tooltip="Export transaction data">
+                Export Transactions
+            </MudButton>
+        </div>
+    </MudItem>
+
+    <!-- Import & Export for Debts -->
+    <MudItem xs="12" sm="4" md="4">
+        <div class="mud-theme-tertiary py-4 px-6 mx-4 rounded-tr-xl shadow-lg">
+            <MudText Align="Align.Center" Variant="Variant.H6">Debts</MudText>
+
+            <!-- Import Button -->
+            <MudButton OnClick="ImportDebts" FullWidth="true" Variant="Variant.Filled" Size="Size.Large"  StartIcon="Icons.Material.Filled.Upload" Tooltip="Import debt data">
+                Import Debts
+            </MudButton>
+
+            <!-- Export Button -->
+            <MudButton OnClick="ExportDebts" FullWidth="true" Size="Size.Large" Variant="Variant.Filled" StartIcon="Icons.Material.Filled.Download" Tooltip="Export debt data">
+                Export Debts
+            </MudButton>
+        </div>
+    </MudItem>
+
+    <!-- Import & Export for Account Status -->
+    <MudItem xs="12" sm="4" md="4">
+        <div class="mud-theme-secondary py-4 px-6 mx-4 rounded-br-xl shadow-lg">
+            <MudText Align="Align.Center" Variant="Variant.H6">Account Status</MudText>
+
+            <!-- Import Button -->
+            <MudButton OnClick="ImportAccountStatus" FullWidth="true" Size="Size.Large" Variant="Variant.Filled" StartIcon="Icons.Material.Filled.Upload" Tooltip="Import account status data">
+                Import Account Status
+            </MudButton>
+
+            <!-- Export Button -->
+            <MudButton OnClick="ExportAccountStatus" FullWidth="true "  Size="Size.Large" Variant="Variant.Filled" StartIcon="Icons.Material.Filled.Download" Tooltip="Export account status data">
+                Export Account Status
+            </MudButton>
+        </div>
+    </MudItem>
+
+</MudGrid>
 
 @code {
+    // Sample import methods
+    private void ImportTransactions()
+    {
+        // Logic to import transactions (CSV, Excel, etc.)
+    }
 
+    private void ImportDebts()
+    {
+        // Logic to import debts (CSV, Excel, etc.)
+    }
+
+    private void ImportAccountStatus()
+    {
+        // Logic to import account status (CSV, Excel, etc.)
+    }
+
+    // Sample export methods
+    private void ExportTransactions()
+    {
+        // Logic to export transactions (CSV, Excel, etc.)
+    }
+
+    private void ExportDebts()
+    {
+        // Logic to export debts (CSV, Excel, etc.)
+    }
+
+    private void ExportAccountStatus()
+    {
+        // Logic to export account status (CSV, Excel, etc.)
+    }
 }

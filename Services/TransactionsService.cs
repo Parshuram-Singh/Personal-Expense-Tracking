@@ -110,8 +110,10 @@ namespace Personal_Expense_Tracking.Services
                 }
             }
         }
-     
-       
+
+
+
+
         public async Task<int> GetTotalNumberOfTransactions()
         {
             using (var db = DataConfig.GetDatabaseConnection())
@@ -129,5 +131,7 @@ namespace Personal_Expense_Tracking.Services
                 }
             }
         }
+
+      
     }
 }

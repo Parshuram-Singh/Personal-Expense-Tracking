@@ -10,23 +10,34 @@
             <MudGrid>
                 <!-- Total Debts Container -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4 mb-4">
-                        <h2 class="text-center">Total Debts</h2>
-                        <div class="text-center">
-                            <h3>@TotalDebts</h3>
+                    <MudPaper Elevation="4" Class="pa-4 mb-4" Style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <h2 style="font-size: 1.8rem; font-weight: bold; color: #333; margin: 0;">Total Debts</h2>
+                        <div class="text-center" style="margin-top: 10px;">
+                            <h3 style="font-size: 2.5rem; font-weight: bold; color: #e53935; margin: 0;">@TotalDebts</h3>
                         </div>
                     </MudPaper>
                 </MudItem>
 
                 <!-- Pending Debts Container -->
                 <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4">
-                        <h2 class="text-center">Pending Debts</h2>
-                        <div class="text-center">
-                            <h3>@PendingDebts</h3>
+                    <MudPaper Elevation="4" Class="pa-4" Style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <h2 style="font-size: 1.8rem; font-weight: bold; color: #333; margin: 0;">Pending Debts</h2>
+                        <div class="text-center" style="margin-top: 10px;">
+                            <h3 style="font-size: 2.5rem; font-weight: bold; color: #e53935; margin: 0;">@PendingDebts</h3>
                         </div>
                     </MudPaper>
                 </MudItem>
+
+                <!-- Pending Debts Container -->
+                <MudItem xs="12">
+                    <MudPaper Elevation="4" Class="pa-4" Style="background-color: #f5f5f5; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <h2 style="font-size: 1.8rem; font-weight: bold; color: #333; margin: 0;">Cleared Debts</h2>
+                        <div class="text-center" style="margin-top: 10px;">
+                            <h3 style="font-size: 2.5rem; font-weight: bold; color: #e53935; margin: 0;">@ClearedDebts</h3>
+                        </div>
+                    </MudPaper>
+                </MudItem>
+
             </MudGrid>
         </MudItem>
 
@@ -74,42 +85,42 @@
 
     <!-- Debts List -->
     <!-- Debts List (Full Width) -->
-<MudGrid>
-    <MudItem xs="12">
-        <MudPaper Elevation="2" Class="p-4 mt-5 mb-5">
-            <h3 class="text-center mb-4">Debt List</h3>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Source</th>
-                            <th>Amount</th>
-                            <th>Due Date</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var debt in AllDebts)
-                        {
+    <MudGrid>
+        <MudItem xs="12">
+            <MudPaper Elevation="2" Class="p-4 mt-5 mb-5">
+                <h3 class="text-center mb-4">Debt List</h3>
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>@debt.Id</td>
-                                <td>@debt.Source</td>
-                                <td>@debt.Amount.ToString("C")</td>
-                                <td>@debt.DueDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@debt.Status</td>
-                                <td>
-                                    <button class="btn btn-danger" @onclick="() => DeleteDebtAsync(debt.Id)">Delete</button>
-                                </td>
+                                <th>Id</th>
+                                <th>Source</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </MudPaper>
-    </MudItem>
-</MudGrid>
+                        </thead>
+                        <tbody>
+                            @foreach (var debt in AllDebts)
+                            {
+                                <tr>
+                                    <td>@debt.Id</td>
+                                    <td>@debt.Source</td>
+                                    <td>@debt.Amount.ToString("C")</td>
+                                    <td>@debt.DueDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@debt.Status</td>
+                                    <td>
+                                        <button class="btn btn-danger" @onclick="() => DeleteDebtAsync(debt.Id)">Delete</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
 </MudContainer>
 
@@ -124,6 +135,8 @@
 
     // Pending debts amount
     private decimal PendingDebts => AllDebts.Where(d => d.Status == Depts.DebtStatus.Pending).Sum(d => d.Amount);
+    private decimal ClearedDebts => AllDebts.Where(d => d.Status == Depts.DebtStatus.Cleared).Sum(d => d.Amount);
+
 
     // Load all debts on initialization
     protected override async Task OnInitializedAsync()

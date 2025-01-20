@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Personal_Expense_Tracking.Models;
 using Personal_Expense_Tracking.Data;
 using SQLite;
+using static Personal_Expense_Tracking.Models.Depts;
 
 namespace Personal_Expense_Tracking.Services
 {
@@ -27,8 +28,6 @@ namespace Personal_Expense_Tracking.Services
                 }
             }
         }
-
-
 
         // Method to get the total debt amount
         public async Task<decimal> GetTotalDeptAmount()
@@ -94,7 +93,14 @@ namespace Personal_Expense_Tracking.Services
                 try
                 {
                     db.CreateTable<Depts>();
-                    await Task.Run(() => db.Update(debt)); // Update debt in the database
+
+                    // Check if debt is already cleared
+                    if (debt.Status == Depts.DebtStatus.Pending)
+                    {
+                        // If cleared, update debt status to Cleared
+                        debt.Status = Depts.DebtStatus.Cleared;
+                        await Task.Run(() => db.Update(debt));  // Update the debt status to Cleared
+                    }
                 }
                 catch (SQLiteException ex)
                 {
@@ -103,6 +109,7 @@ namespace Personal_Expense_Tracking.Services
                 }
             }
         }
+
 
         // Method to delete a specific debt
         public async Task DeleteDebt(Depts debt)
@@ -122,5 +129,49 @@ namespace Personal_Expense_Tracking.Services
                 }
             }
         }
+
+
+        public async Task<decimal> GetTotalPendingDeptAmount(decimal creditAmount)
+        {
+            using (var db = DataConfig.GetDatabaseConnection())
+            {
+                try
+                {
+                    db.CreateTable<Depts>();
+                    var pendingDebts = await Task.Run(() =>
+                        db.Table<Depts>()
+                          .Where(d => d.Status == Depts.DebtStatus.Pending)
+                          .OrderBy(d => d.Amount)
+                          .ToList()
+                    );
+
+                    decimal remainingCredit = creditAmount;
+
+                    foreach (var debt in pendingDebts)
+                    {
+                        if (remainingCredit >= debt.Amount)
+                        {
+                            remainingCredit -= debt.Amount;
+                            debt.Status = Depts.DebtStatus.Cleared;
+                            await Task.Run(() => db.Update(debt));
+                        }
+                        else
+                        {
+                            break; // Stop when credit is insufficient to cover further debts
+                        }
+                    }
+
+                    // Return the remaining credit or the amount of debt still pending
+                    return pendingDebts.Where(d => d.Status == Depts.DebtStatus.Pending).Sum(d => d.Amount);
+                }
+                catch (SQLiteException ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error calculating and clearing pending debt amount: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+
     }
 }

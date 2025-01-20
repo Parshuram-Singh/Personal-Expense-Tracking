@@ -71,13 +71,11 @@
 
             if (UserService.VerifyUserCredentials(user.Username, user.Password))
             {
-                System.Diagnostics.Debug.WriteLine("Login successful!");
                 StatusMessage = "Login successful!";
                 NavigationManager.NavigateTo("/dashboard");
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Invalid login attempt.");
                 StatusMessage = "Invalid login attempt. Please try again.";
             }
         }
@@ -94,7 +92,7 @@
         var defaultUser = new User
             {
                 Username = "pratik",
-                Password = "12345", // Use hashed password in production
+                Password = "12345",
                 PreferredCurrency = "NPR"
             };
         UserService.EnsureUserExists(defaultUser);

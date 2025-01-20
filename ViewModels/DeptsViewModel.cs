@@ -102,5 +102,23 @@ namespace Personal_Expense_Tracking.ViewModels
                 throw;
             }
         }
+        public async Task<decimal> GetTotalPendingAmount(decimal creditAmount)
+        {
+            try
+            {
+                // Call the service to get the total pending debt amount
+                return await _deptService.GetTotalPendingDeptAmount(creditAmount);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error calculating total pending amount: {ex.Message}");
+                throw;
+            }
+
+        }
+      
+
+       
+
     }
 }

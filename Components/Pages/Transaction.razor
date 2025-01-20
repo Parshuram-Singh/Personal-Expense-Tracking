@@ -5,27 +5,28 @@
 
 <!-- Wrap the entire content in a scrollable div -->
 <div id="scrollable-container" style="height: 90vh; overflow: auto;">
+
     <MudContainer Class="mt-5 px-4">
         <MudGrid>
-            <!-- Left Container for Total Transactions and Total Number of Transactions -->
             <MudItem xs="12" sm="6">
                 <MudGrid>
                     <!-- Total Transactions -->
                     <MudItem xs="12">
-                        <MudPaper Elevation="2" Class="p-4" Style="height: 200px;">
-                            <h3>Total Transactions</h3>
-                            <p>@account.Balance</p>
+                        <MudPaper Elevation="4" Class="p-4" Style="height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #f5f5f5;">
+                            <h3 style="font-size: 1.5rem; color: #333;">Total Transactions</h3>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #00796b; margin-top: 10px;">@account.Balance</p>
                         </MudPaper>
                     </MudItem>
                     <!-- Total Number of Transactions -->
                     <MudItem xs="12">
-                        <MudPaper Elevation="2" Class="p-4" Style="height: 200px;">
-                            <h3>Total Number of Transactions</h3>
-                            <p>@account.TotalNumberOfTransaction</p>
+                        <MudPaper Elevation="4" Class="p-4" Style="height: 200px; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #f5f5f5;">
+                            <h3 style="font-size: 1.5rem; color: #333;">Total Number of Transactions</h3>
+                            <p style="font-size: 2.5rem; font-weight: bold; color: #00796b; margin-top: 10px;">@account.TotalNumberOfTransaction</p>
                         </MudPaper>
                     </MudItem>
                 </MudGrid>
             </MudItem>
+
 
             <!-- Right Container for the Form -->
             <MudItem xs="12" sm="6">
@@ -74,8 +75,25 @@
                         <!-- Tag Input -->
                         <div class="mb-3">
                             <label for="tag" class="form-label">Tag</label>
-                            <InputText id="tag" @bind-Value="transaction.Tag" class="form-control" placeholder="Enter transaction tag" required />
+
+                            <!-- Dropdown for predefined tags -->
+                            <select id="tag" @bind="transaction.Tag" class="form-control" required>
+                                <option value="">Select a tag</option>
+                                <option value="food">Food</option>
+                                <option value="drink">Drink</option>
+                                <option value="salary">Salary</option>
+                                <option value="groceries">Groceries</option>
+                                <option value="custom">Custom</option>
+                            </select>
+
+                            <!-- Input field for custom tag, shown only when "Custom" is selected -->
+    @if (transaction.Tag == "custom")
+    {
+        <input  id="tag" class="form-control" placeholder="Enter custom tag" />
+    }
                         </div>
+
+
                         <!-- Amount Input -->
                         <div class="mb-3">
                             <label for="amount" class="form-label">Amount</label>
@@ -130,7 +148,6 @@
             </MudItem>
         </MudGrid>
     </MudContainer>
-
     
 </div>
 
@@ -140,7 +157,6 @@
     private Account account = new Account();
     private string? StatusMessage;
     private List<Transactions> transactions;
-    Color Color = Color.Success;
 
     protected override async Task OnInitializedAsync()
     {
@@ -195,3 +211,5 @@
 
     
 }
+
+      
